@@ -1,0 +1,136 @@
+FuelConsumption <- read.csv("~/Desktop/FuelConsumption.csv")
+
+# 1 Describe el conjunto de datos relacionados...
+# Atributos del Auto
+# y2=mpg
+# y=gpm  (2.6 min, 6.45 max) ---> summary(FuelConsumption)
+# wt Workt (1.915 min, 4.360 max)
+# dis (85, 360)
+# nc num. cilin (4, 8)
+# HP HorcePower (65, 155)
+# ACC Acceleration (11.3, 19.2)
+# ET (0, 1)
+
+plot (GPM~ACC, data=FuelConsumption) # estan muy distorcionados
+plot (GPM~WT, data=FuelConsumption)  # hay una mejor relaci??n
+
+
+FuelCons<-FuelConsumption[-1] # limpia el modelo
+head(FuelConsumption)
+
+
+# 3
+# comentario de alimno: se puede hacer con sumar datos manuales -->
+m1<-lm(GPM~.,data=FuelCons)  # variables dependientes o GPM=alfa + b1wt + b2
+summary(m1)
+
+# 3 (modelo lineal con todas las variables)
+# GPM = -2.6 + .78 WT - .004 DIS + .444 NC + .023 HP + .068 ACC - 0.9596 ET
+# p-value, debe de estar abajo de .05: confianza del modelo 
+
+
+# 4.- ??Cu??nta variaci??n de los datos es explicada por el modelo del inciso (3)? ??Es bueno el modelo?
+r al cuadrado
+
+# 5.- ??C??mo puedes d
+#Generar una matriz de correlacion
+cor(FuelCons) 
+
+GWT-WT mayor de .9 o mayor de .5
+WT-DIS
+NC-DIS
+HP-WT
+
+#6 
+# Adjusted R-squared --> 0.9267  mejorar el 
+m2<-lm(GPM~WT+DIS,data=FuelCons)  # variables dependientes o GPM=alfa + b1wt + b2
+summary(m2)
+
+# instala una libreria
+install.packages("leaps")
+library(leaps)
+
+x=FuelCons[2:7]
+y=FuelCons[,1]
+
+# nbest dos suele dar mejores resultados
+out<-summary(regsubsets(x,y,nbest = 2,nvmax = ncol(x)))
+summary(out)
+
+tab<-cbind(out$which, out$rsq, out$adjr2, out$cp)
+tab # 
+
+# Buscar la mejor convinaci??n, la idea es que con los menos par??metros se
+# se tenga un valor mas alto 
+# malow- cp
+
+# tarea, aplicar este modelo a otro data set (Correr regression con datos)
+# que nosotros elijamos, 3 personas presentan
+# mis datos son estos...
+# revisar la documentacion Library R-Cassandra
+
+# Boston Marathon 2013
+
+BostonMarathon <- read.csv("C:/Users/Luis Escobar/Desktop/300754718.csv")
+BostonMarathon <- read.csv("~/Desktop/300754718.csv")
+head(BostonMarathon)
+
+plot (Tiempo.Acomul~Tiempo, data=BostonMarathon)
+plot (Tiempo~Distancia, data=BostonMarathon)
+plot (Tiempo~Tiempo.Acomul, data=BostonMarathon)
+BostonMarathonFix <- BostonMarathon[1:8,]
+BostonMarathonFix
+
+m1BM<-lm(Tiempo~Tiempo.Acomul,data=BostonMarathonFix)  # variables dependientes o GPM=alfa + b1wt + b2
+summary(m1BM)
+plot (Tiempo~Tiempo.Acomul, data=BostonMarathonFix)
+abline(m1BM)
+
+# otro análisis
+anova(m1BM) # Analysis of Variance Table
+residuos = rstandard(m1BM)
+qqnorm(residuos) ## temp
+
+install.packages("arm")
+library("arm")
+display(fit)
+coefplot(m1BM) 
+
+
+
+# Programming-assignment-2 
+
+## Creates a special matrix object that can cache its inverse
+makeCacheMatrix <- function( m = matrix() ) {
+  
+  ## Initialize the inverse property
+  i <- NULL
+  
+  ## Method to set the matrix
+  set <- function( matrix ) {
+    m <<- matrix
+    i <<- NULL
+  }
+  
+  ## Method the get the matrix
+  get <- function() {
+    ## Return the matrix
+    m
+  }
+  
+  ## Method to set the inverse of the matrix
+  setInverse <- function(inverse) {
+    i <<- inverse
+  }
+  
+  ## Method to get the inverse of the matrix
+  getInverse <- function() {
+    ## Return the inverse property
+    i
+  }
+  
+  ## Return a list of the methods
+  list(set = set, get = get,
+       setInverse = setInverse,
+       getInverse = getInverse)
+}
